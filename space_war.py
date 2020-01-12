@@ -28,6 +28,19 @@ class Sprite(turtle.Turtle):
     def move(self):
         # forward() function moves the turtle forward
         self.forward(self.speed)
+        # Border detection
+        if self.xcor() > 240:
+            # Turn around when hit right border
+            self.right(60)
+        if self.xcor() < -240:
+            # Turn around when hit left border
+            self.right(60)
+        if self.ycor() > 240:
+            # Turn around when hit top border
+            self.left(60)
+        if self.ycor() < -240:
+            # Turn around when hit bottom border
+            self.left(60)
 
 class Player(Sprite):
     def __init__(self, sprite_shape, color, startx, starty):
@@ -47,9 +60,37 @@ class Player(Sprite):
         self.speed += 1
 
     def decelerate(self):
-        if self.speed > 0:
-            self.speed -= 1
+        # if self.speed > 0:
+        self.speed -= 1
 
+
+class Game:
+    def __init__(self):
+        self.level = 1
+        self.score = 0
+        self.state = 'playing'
+        self.pen = turtle.Turtle()
+        self.lives = 3
+
+    def draw_border(self):
+        """Draw border"""
+        self.pen.speed(0)
+        self.pen.color('white')
+        self.pen.pensize(3)
+        self.pen.penup()
+        self.pen.goto(-250, 250)
+        self.pen.pendown()
+        for _ in range(4):
+            self.pen.forward(500)
+            self.pen.right(90)
+        self.pen.penup()
+        self.pen.hideturtle()
+
+
+# Create the Game object
+game = Game()
+# Draw the border
+game.draw_border()
 
 # Create my player
 player = Player('triangle', 'white', 0, 0)
