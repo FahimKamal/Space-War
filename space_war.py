@@ -257,7 +257,7 @@ window.onkeypress(missile.fire, 'space')
 # Main game loop
 while True:
     window.update()
-    time.sleep(0.01)
+    time.sleep(0.001)
     space_ship.move()
     # ally.move()
     # enemy.move()
@@ -334,6 +334,7 @@ while True:
         particle.move()
 
     if not game.lives:
+        # Display Game Over and final score and end the game
         game.score_board.clear()
         game.score_board.color('red')
         game.score_board.goto(0, 0)
@@ -341,6 +342,9 @@ while True:
         game.score_board.sety(-50)
         game.score_board.color('white')
         game.score_board.write(f'Final score: {game.score}', align='center', font=('Arial', 24, 'normal'))
+
+        # Play the game over sound
+        winsound.PlaySound('Lost_life.wav', winsound.SND_ASYNC)
         break
 
 while True:
