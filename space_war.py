@@ -216,7 +216,7 @@ class Game:
 
     def show_status(self):
         """Show the game status on the screen"""
-        message = f'Score: {self.score}'
+        message = f'Score: {self.score}     Lives: {self.lives}'
         self.score_board.speed(0)
         self.score_board.color('white')
         self.score_board.penup()
@@ -276,15 +276,16 @@ while True:
             # Send the enemy to a random location in screen
             enemy.go_random()
 
-            # Lose point if you crash with enemy ship
+            # Lose point also live if you crash with enemy ship
             game.score -= 100
+            game.lives -= 1
             game.show_status()
 
             # Play sound
             # os.system('afplay explosion.wav&') To play sound in mac
             # os.system('aplay explosion.wav&') To play sound in linux
             winsound.PlaySound('explosion.wav', winsound.SND_ASYNC)  # To play sound in Windows
-            
+
         # Collision check between missile and enemy
         if missile.is_collision(enemy):
             # Send the enemy to a random location in screen
@@ -331,3 +332,16 @@ while True:
 
     for particle in particles:
         particle.move()
+
+    if not game.lives:
+        game.score_board.clear()
+        game.score_board.color('red')
+        game.score_board.goto(0, 0)
+        game.score_board.write('Game Over', align='center', font=('Arial', 30, 'bold'))
+        game.score_board.sety(-50)
+        game.score_board.color('white')
+        game.score_board.write(f'Final score: {game.score}', align='center', font=('Arial', 24, 'normal'))
+        break
+
+while True:
+    window.update()
