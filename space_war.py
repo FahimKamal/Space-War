@@ -124,6 +124,34 @@ class Ally(Sprite):
         self.go_random()
 
 
+class Particle(Sprite):
+    """
+    Multiple number of objects of this class will appear at the collision
+    position to demonstrate the explosion effect.
+    """
+    def __init__(self, sprite_shape, color, startx, starty):
+        Sprite.__init__(self, sprite_shape, color, startx, starty)
+        self.goto(-1000, -1000)
+        self.shapesize(stretch_wid=0.1, stretch_len=0.1, outline=None)
+        self.frame = 0
+
+    def explode(self, startx, starty):
+        """Will start the explosion effect"""
+        self.goto(startx, starty)
+        self.setheading(random.randint(0, 360))
+        self.frame = 1
+
+    def move(self):
+        """Will create the explosion effect till frame reach frame to 20"""
+        if self.frame:
+            self.forward(10)
+            self.frame += 1
+        if self.frame > 20:
+            # Stop the effect and sends the particles out of screen
+            self.frame = 0
+            self.goto(-1000, 1000)
+
+
 class Missile(Sprite):
     """
     Weapon of the player space ship.
@@ -215,6 +243,8 @@ missile = Missile('triangle', 'yellow', 0, 0)
 enemies = [Enemy('circle', 'red', -100, 0) for enemy in range(random.randint(3, 8))]
 # Create multiple allies in random numbers
 allies = [Ally('square', 'blue', 0, -100) for ally in range(random.randint(3, 8))]
+# Create the explosion particles
+particles = [Particle('circle', 'orange', 0, 0) for particle in range(20)]
 
 # Keyboard binding
 window.listen()
@@ -239,7 +269,13 @@ while True:
 
         # Collision check between space ship and enemy
         if space_ship.is_collision(enemy):
+            # Do the explosion effect
+            for particle in particles:
+                particle.explode(enemy.xcor(), enemy.ycor())
+
+            # Send the enemy to a random location in screen
             enemy.go_random()
+
             # Lose point if you crash with enemy ship
             game.score -= 100
             game.show_status()
@@ -251,8 +287,14 @@ while True:
 
         # Collision check between missile and enemy
         if missile.is_collision(enemy):
+            # Send the enemy to a random location in screen
             enemy.go_random()
             missile.status = 'ready'
+
+            # Do the explosion effect
+            for particle in particles:
+                particle.explode(missile.xcor(), missile.ycor())
+
             missile.goto(-1000, 1000)
             # Shoot the enemy to gain point
             game.score += 100
@@ -269,8 +311,14 @@ while True:
 
         # Collision check between missile and ally
         if missile.is_collision(ally):
+            # Send the ally to a random location in screen
             ally.go_random()
             missile.status = 'ready'
+
+            # Do the explosion effect
+            for particle in particles:
+                particle.explode(missile.xcor(), missile.ycor())
+
             missile.goto(-1000, 1000)
             # You shoot your ally you lose point
             game.score -= 50
@@ -280,3 +328,6 @@ while True:
             # os.system('afplay explosion.wav&') To play sound in mac
             # os.system('aplay explosion.wav&') To play sound in linux
             winsound.PlaySound('explosion.wav', winsound.SND_ASYNC)  # To play sound in windows
+
+    for particle in particles:
+        particle.move()
