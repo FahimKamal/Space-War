@@ -4,6 +4,7 @@ Created by: Fahim kamal
 Date: 12.01.2020
 """
 import turtle
+import winsound
 import time
 import os
 import random
@@ -126,6 +127,11 @@ class Missile(Sprite):
             self.setheading(space_ship.heading())
             self.status = 'firing'
 
+            # Play sound
+            # os.system('afplay laser-gun.wav&') To play sound in mac
+            # os.system('aplay laser-gun.wav&') To play sound in linux
+            winsound.PlaySound('laser-gun.wav', winsound.SND_ASYNC)  # To play sound in Windows
+
     def move(self):
         """Will make the missile to move"""
         if self.status == 'firing':
@@ -144,6 +150,7 @@ class Game:
         self.score = 0
         self.state = 'playing'
         self.pen = turtle.Turtle()
+        self.score_board = turtle.Turtle()
         self.lives = 3
 
     def draw_border(self):
@@ -160,11 +167,23 @@ class Game:
         self.pen.penup()
         self.pen.hideturtle()
 
+    def show_status(self):
+        """Show the game status on the screen"""
+        message = f'Score: {self.score}'
+        self.score_board.speed(0)
+        self.score_board.color('white')
+        self.score_board.penup()
+        self.score_board.goto(-250, 260)
+        self.score_board.clear()
+        self.score_board.write(message, font=('Arial', 14, 'normal'))
+
 
 # Create the Game object
 game = Game()
 # Draw the border
 game.draw_border()
+# Show status
+game.show_status()
 
 # Create my sprites
 space_ship = SpaceShip('triangle', 'white', 0, 0)
@@ -190,15 +209,39 @@ while True:
     # Collision check between space ship and enemy
     if space_ship.is_collision(enemy):
         enemy.go_random()
+        # Lose point if you crash with enemy ship
+        game.score -= 100
+        game.show_status()
+
+        # Play sound
+        # os.system('afplay explosion.wav&') To play sound in mac
+        # os.system('aplay explosion.wav&') To play sound in linux
+        winsound.PlaySound('explosion.wav', winsound.SND_ASYNC)  # To play sound in Windows
 
     # Collision check between missile and enemy
     if missile.is_collision(enemy):
         enemy.go_random()
         missile.status = 'ready'
         missile.goto(-1000, 1000)
+        # Shoot the enemy to gain point
+        game.score += 100
+        game.show_status()
 
-    # Collision check betwen missile and ally
+        # Play sound
+        # os.system('afplay explosion.wav&') To play sound in mac
+        # os.system('aplay explosion.wav&') To play sound in linux
+        winsound.PlaySound('explosion.wav', winsound.SND_ASYNC)  # To play sound in windows
+
+    # Collision check between missile and ally
     if missile.is_collision(ally):
         ally.go_random()
         missile.status = 'ready'
         missile.goto(-1000, 1000)
+        # You shoot your ally you lose point
+        game.score -= 50
+        game.show_status()
+
+        # Play sound
+        # os.system('afplay explosion.wav&') To play sound in mac
+        # os.system('aplay explosion.wav&') To play sound in linux
+        winsound.PlaySound('explosion.wav', winsound.SND_ASYNC)  # To play sound in windows
