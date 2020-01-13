@@ -14,10 +14,12 @@ window = turtle.Screen()
 window.title('SpaceWar by Fahim Kamal')
 window.bgcolor('black')
 window.setup(width=600, height=600)
-window.tracer()
+# tracer() function is used to control the speed of the game which is amazing
+window.tracer(0)
 
 
 class Sprite(turtle.Turtle):
+    """Main Base class of the game"""
     def __init__(self, sprite_shape, color, startx, starty):
         turtle.Turtle.__init__(self, shape=sprite_shape)
         self.speed(0)
@@ -69,9 +71,10 @@ class Sprite(turtle.Turtle):
 
 
 class SpaceShip(Sprite):
+    """Player controllable space ship class"""
     def __init__(self, sprite_shape, color, startx, starty):
         Sprite.__init__(self, sprite_shape, color, startx, starty)
-        self.speed = 4
+        self.speed = 2
         self.lives = 3
 
     def turn_left(self):
@@ -84,35 +87,48 @@ class SpaceShip(Sprite):
 
     def accelerate(self):
         """Accelerate the speed of the space ship"""
-        self.speed += 1
+        self.speed += 0.5
 
     def decelerate(self):
         """Decelerate the speed of the space ship"""
-        self.speed -= 1
+        self.speed -= 0.5
 
 
 class Enemy(Sprite):
+    """
+    Computer controlled enemy ships that flies around.
+    Collision with them is not recommended.
+    """
     def __init__(self, sprite_shape, color, startx, starty):
         Sprite.__init__(self, sprite_shape, color, startx, starty)
-        self.speed = 3
+        self.speed = 1
         self.setheading(random.randint(0, 360))
         # Will appear in random location
         self.go_random()
 
 
 class Ally(Sprite):
+    """
+    Computer controlled ally ships that fies around.
+    They are harm less, but shooting them will cause penalty.
+    So shooting them is not recommended.
+    """
     def __init__(self, sprite_shape, color, startx, starty):
         Sprite.__init__(self, sprite_shape, color, startx, starty)
-        self.speed = 6
+        self.speed = 1
         self.setheading(random.randint(0, 360))
         # will appear in random location
         self.go_random()
 
 
 class Missile(Sprite):
+    """
+    Weapon of the player space ship.
+    Harmful for both enemy and ally, so use wisely.
+    """
     def __init__(self, sprite_shape, color, startx, starty):
         Sprite.__init__(self, sprite_shape, color, startx, starty)
-        self.speed = 20
+        self.speed = 7
         self.status = 'ready'
         # keep the missile out of screen until needed
         self.goto(-1000, 1000)
@@ -187,9 +203,14 @@ game.show_status()
 
 # Create my sprites
 space_ship = SpaceShip('triangle', 'white', 0, 0)
-ally = Ally('square', 'blue', 0, 0)
-enemy = Enemy('circle', 'red', 0, 0)
+# ally = Ally('square', 'blue', 0, 0)
+# enemy = Enemy('circle', 'red', 0, 0)
 missile = Missile('triangle', 'yellow', 0, 0)
+
+# Create multiple enemies
+enemies = [Enemy('circle', 'red', -100, 0) for enemy in range(random.randint(3, 8))]
+# Create multiple allies
+allies = [Ally('square', 'blue', 0, -100) for ally in range(random.randint(3, 8))]
 
 # Keyboard binding
 window.listen()
@@ -201,47 +222,57 @@ window.onkeypress(missile.fire, 'space')
 
 # Main game loop
 while True:
+    window.update()
+    time.sleep(0.01)
     space_ship.move()
-    ally.move()
-    enemy.move()
+    # ally.move()
+    # enemy.move()
     missile.move()
 
-    # Collision check between space ship and enemy
-    if space_ship.is_collision(enemy):
-        enemy.go_random()
-        # Lose point if you crash with enemy ship
-        game.score -= 100
-        game.show_status()
+    # Movement for all enemies
+    for enemy in enemies:
+        enemy.move()
 
-        # Play sound
-        # os.system('afplay explosion.wav&') To play sound in mac
-        # os.system('aplay explosion.wav&') To play sound in linux
-        winsound.PlaySound('explosion.wav', winsound.SND_ASYNC)  # To play sound in Windows
+        # Collision check between space ship and enemy
+        if space_ship.is_collision(enemy):
+            enemy.go_random()
+            # Lose point if you crash with enemy ship
+            game.score -= 100
+            game.show_status()
 
-    # Collision check between missile and enemy
-    if missile.is_collision(enemy):
-        enemy.go_random()
-        missile.status = 'ready'
-        missile.goto(-1000, 1000)
-        # Shoot the enemy to gain point
-        game.score += 100
-        game.show_status()
+            # Play sound
+            # os.system('afplay explosion.wav&') To play sound in mac
+            # os.system('aplay explosion.wav&') To play sound in linux
+            winsound.PlaySound('explosion.wav', winsound.SND_ASYNC)  # To play sound in Windows
 
-        # Play sound
-        # os.system('afplay explosion.wav&') To play sound in mac
-        # os.system('aplay explosion.wav&') To play sound in linux
-        winsound.PlaySound('explosion.wav', winsound.SND_ASYNC)  # To play sound in windows
+        # Collision check between missile and enemy
+        if missile.is_collision(enemy):
+            enemy.go_random()
+            missile.status = 'ready'
+            missile.goto(-1000, 1000)
+            # Shoot the enemy to gain point
+            game.score += 100
+            game.show_status()
 
-    # Collision check between missile and ally
-    if missile.is_collision(ally):
-        ally.go_random()
-        missile.status = 'ready'
-        missile.goto(-1000, 1000)
-        # You shoot your ally you lose point
-        game.score -= 50
-        game.show_status()
+            # Play sound
+            # os.system('afplay explosion.wav&') To play sound in mac
+            # os.system('aplay explosion.wav&') To play sound in linux
+            winsound.PlaySound('explosion.wav', winsound.SND_ASYNC)  # To play sound in windows
 
-        # Play sound
-        # os.system('afplay explosion.wav&') To play sound in mac
-        # os.system('aplay explosion.wav&') To play sound in linux
-        winsound.PlaySound('explosion.wav', winsound.SND_ASYNC)  # To play sound in windows
+    # Movement for all allies
+    for ally in allies:
+        ally.move()
+
+        # Collision check between missile and ally
+        if missile.is_collision(ally):
+            ally.go_random()
+            missile.status = 'ready'
+            missile.goto(-1000, 1000)
+            # You shoot your ally you lose point
+            game.score -= 50
+            game.show_status()
+
+            # Play sound
+            # os.system('afplay explosion.wav&') To play sound in mac
+            # os.system('aplay explosion.wav&') To play sound in linux
+            winsound.PlaySound('explosion.wav', winsound.SND_ASYNC)  # To play sound in windows
