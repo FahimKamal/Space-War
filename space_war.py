@@ -13,6 +13,8 @@ import random
 window = turtle.Screen()
 window.title('SpaceWar by Fahim Kamal')
 window.bgcolor('black')
+# Change the background image
+window.bgpic('game_bg.gif')
 window.setup(width=600, height=600)
 # tracer() function is used to control the speed of the game which is amazing
 window.tracer(0)
@@ -76,6 +78,7 @@ class SpaceShip(Sprite):
         Sprite.__init__(self, sprite_shape, color, startx, starty)
         self.speed = 2
         self.lives = 3
+        self.shapesize(stretch_wid=0.6, stretch_len=1.2)
 
     def turn_left(self):
         """Turns the turtle by 45 degree to the left"""
@@ -190,6 +193,7 @@ class Game:
         self.score_board.color('white')
         self.score_board.penup()
         self.score_board.goto(-250, 260)
+        self.score_board.hideturtle()
         self.score_board.clear()
         self.score_board.write(message, font=('Arial', 14, 'normal'))
 
@@ -207,9 +211,9 @@ space_ship = SpaceShip('triangle', 'white', 0, 0)
 # enemy = Enemy('circle', 'red', 0, 0)
 missile = Missile('triangle', 'yellow', 0, 0)
 
-# Create multiple enemies
+# Create multiple enemies in random numbers
 enemies = [Enemy('circle', 'red', -100, 0) for enemy in range(random.randint(3, 8))]
-# Create multiple allies
+# Create multiple allies in random numbers
 allies = [Ally('square', 'blue', 0, -100) for ally in range(random.randint(3, 8))]
 
 # Keyboard binding
