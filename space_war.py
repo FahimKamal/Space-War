@@ -284,7 +284,7 @@ while True:
             # os.system('afplay explosion.wav&') To play sound in mac
             # os.system('aplay explosion.wav&') To play sound in linux
             winsound.PlaySound('explosion.wav', winsound.SND_ASYNC)  # To play sound in Windows
-
+            
         # Collision check between missile and enemy
         if missile.is_collision(enemy):
             # Send the enemy to a random location in screen
