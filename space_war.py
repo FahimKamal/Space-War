@@ -93,8 +93,19 @@ class SpaceShip(Sprite):
 class Enemy(Sprite):
     def __init__(self, sprite_shape, color, startx, starty):
         Sprite.__init__(self, sprite_shape, color, startx, starty)
+        self.speed = 3
+        self.setheading(random.randint(0, 360))
+        # Will appear in random location
+        self.go_random()
+
+
+class Ally(Sprite):
+    def __init__(self, sprite_shape, color, startx, starty):
+        Sprite.__init__(self, sprite_shape, color, startx, starty)
         self.speed = 6
         self.setheading(random.randint(0, 360))
+        # will appear in random location
+        self.go_random()
 
 
 class Missile(Sprite):
@@ -104,7 +115,7 @@ class Missile(Sprite):
         self.status = 'ready'
         # keep the missile out of screen until needed
         self.goto(-1000, 1000)
-        self.shapesize(stretch_wid=0.3, stretch_len=0.4)
+        self.shapesize(stretch_wid=0.3, stretch_len=0.4, outline=None)
 
     def fire(self):
         """Shoot the missile from the space ship"""
@@ -157,6 +168,7 @@ game.draw_border()
 
 # Create my sprites
 space_ship = SpaceShip('triangle', 'white', 0, 0)
+ally = Ally('square', 'blue', 0, 0)
 enemy = Enemy('circle', 'red', 0, 0)
 missile = Missile('triangle', 'yellow', 0, 0)
 
@@ -171,9 +183,22 @@ window.onkeypress(missile.fire, 'space')
 # Main game loop
 while True:
     space_ship.move()
+    ally.move()
     enemy.move()
     missile.move()
 
-    # Collision check
+    # Collision check between space ship and enemy
     if space_ship.is_collision(enemy):
         enemy.go_random()
+
+    # Collision check between missile and enemy
+    if missile.is_collision(enemy):
+        enemy.go_random()
+        missile.status = 'ready'
+        missile.goto(-1000, 1000)
+
+    # Collision check betwen missile and ally
+    if missile.is_collision(ally):
+        ally.go_random()
+        missile.status = 'ready'
+        missile.goto(-1000, 1000)
